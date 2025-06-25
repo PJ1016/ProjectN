@@ -1,39 +1,111 @@
-import './App.css'
+import {
+  CssBaseline,
+  ThemeProvider,
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Product from "./components/Product";
+import HomePage from "./containers/HomePage";
+import { theme } from "./components/theme";
 
 function App() {
-  // Sample data for the table
-  const data = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Developer' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Designer' },
-    { id: 3, name: 'Bob Johnson', email: 'bob@example.com', role: 'Manager' },
-    { id: 4, name: 'Alice Brown', email: 'alice@example.com', role: 'Tester' },
-  ]
+  const [anchorEl, setAnchorEl] = useState(null);
+  const muiTheme = useTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
+
+  const handleMenuOpen = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
-    <div className="container">
-      <h1>Sample Table</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((row) => (
-            <tr key={row.id}>
-              <td>{row.id}</td>
-              <td>{row.name}</td>
-              <td>{row.email}</td>
-              <td>{row.role}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography
+              variant="h5"
+              component="div"
+              sx={{ flexGrow: 1, fontWeight: "bold" }}
+            >
+              Project #N
+            </Typography>
+            {isMobile ? (
+              <>
+                <IconButton color="inherit" onClick={handleMenuOpen}>
+                  <MenuIcon />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  onClose={handleMenuClose}
+                >
+                  <MenuItem component={Link} to="/" onClick={handleMenuClose}>
+                    Home
+                  </MenuItem>
+                  <MenuItem
+                    component={Link}
+                    to="/product"
+                    onClick={handleMenuClose}
+                  >
+                    Products
+                  </MenuItem>
+                  <MenuItem
+                    component={Link}
+                    to="/safety"
+                    onClick={handleMenuClose}
+                  >
+                    Safety Resources
+                  </MenuItem>
+                  <MenuItem
+                    component={Link}
+                    to="/support"
+                    onClick={handleMenuClose}
+                  >
+                    Support
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Box sx={{ display: "flex", gap: 2 }}>
+                <Button color="inherit" component={Link} to="/">
+                  Home
+                </Button>
+                <Button color="inherit" component={Link} to="/product">
+                  Products
+                </Button>
+                <Button color="inherit" component={Link} to="/safety">
+                  Safety Resources
+                </Button>
+                <Button color="inherit" component={Link} to="/support">
+                  Support
+                </Button>
+              </Box>
+            )}
+          </Toolbar>
+        </AppBar>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/product" element={<Product />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;
