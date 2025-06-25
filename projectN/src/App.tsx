@@ -102,6 +102,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/product" element={<Product />} />
+          <Route path="*" element={<h1>Sorry</h1>} />
         </Routes>
       </Router>
     </ThemeProvider>
