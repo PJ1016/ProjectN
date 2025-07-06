@@ -34,10 +34,16 @@ const OptionGroup = ({
         size="small"
         sx={{
           mb: 2,
+          width: '100%',
+          flexWrap: 'wrap',
           "& .MuiToggleButton-root": {
-            px: 3,
+            px: { xs: 1, sm: 3 },
+            py: 1,
             borderRadius: "12px",
             textTransform: "none",
+            fontSize: { xs: '0.75rem', sm: '0.875rem' },
+            minWidth: 'auto',
+            flex: { xs: '1 1 auto', sm: 'none' },
           },
         }}
       >

@@ -47,15 +47,7 @@ export default function AdminPage() {
   const handleSubmit = async () => {
     try {
       setUploading(true);
-      let imageUrl = editingProduct?.imageUrl || "";
-
-      if (imageFile) {
-        imageUrl = await storageService.uploadImage(
-          imageFile,
-          `${Date.now()}_${imageFile.name}`
-        );
-      }
-
+      
       const productData = {
         name: formData.name,
         price: parseFloat(formData.price),
@@ -63,15 +55,20 @@ export default function AdminPage() {
         stock: parseInt(formData.stock),
         description: formData.description,
         category: formData.category,
-        imageUrl,
+        imageUrl: editingProduct?.imageUrl || '',
       };
 
+      console.log('Saving product:', productData);
+
       if (editingProduct?.id) {
-        await updateProduct({ id: editingProduct.id, product: productData });
+        const result = await updateProduct({ id: editingProduct.id, product: productData });
+        console.log('Update result:', result);
       } else {
-        await addProduct(productData);
+        const result = await addProduct(productData);
+        console.log('Add result:', result);
       }
 
+      console.log('Product saved successfully');
       setOpen(false);
       setFormData({
         name: "",
@@ -292,25 +289,10 @@ export default function AdminPage() {
             sx={{ mb: 2 }}
           />
 
-          <Button
-            component="label"
-            variant="outlined"
-            startIcon={<CloudUpload />}
-            sx={{ mb: 2 }}
-          >
-            Upload Image
-            <input
-              type="file"
-              hidden
-              accept="image/*"
-              onChange={(e) => setImageFile(e.target.files?.[0] || null)}
-            />
-          </Button>
-          {imageFile && (
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              Selected: {imageFile.name}
-            </Typography>
-          )}
+          {/* Image upload temporarily disabled due to CORS issues */}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Image upload temporarily disabled
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>

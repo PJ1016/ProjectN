@@ -7,8 +7,8 @@ const productImages = [
   "https://images.pexels.com/photos/5938366/pexels-photo-5938366.jpeg",
 ];
 
-const ProductImageGallery = () => {
-  const [selectedImage, setSelectedImage] = useState(productImages[0]);
+const ProductImageGallery = ({ productImage }: { productImage?: string }) => {
+  const [selectedImage, setSelectedImage] = useState(productImage || productImages[0]);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -59,7 +59,7 @@ const ProductImageGallery = () => {
         }}
       >
         <img
-          src={selectedImage}
+          src={productImage || selectedImage}
           alt="Sanitary Pad Product"
           style={{
             width: "100%",
