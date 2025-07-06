@@ -26,6 +26,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { Provider } from "react-redux";
 import { store } from "./store";
 import { AuthButton } from "./components/AuthButton";
+import AdminPage from "./containers/AdminPage";
+import { useAppSelector } from "./store/hooks";
 
 function App() {
   return (
@@ -46,6 +48,7 @@ function AppContent() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
+  const { isAdmin } = useAppSelector(state => state.admin);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -105,6 +108,15 @@ function AppContent() {
                 >
                   Support
                 </MenuItem>
+                {isAdmin && (
+                  <MenuItem
+                    component={Link}
+                    to="/admin"
+                    onClick={handleMenuClose}
+                  >
+                    Admin
+                  </MenuItem>
+                )}
               </Menu>
             </>
           ) : (
@@ -121,6 +133,11 @@ function AppContent() {
               <Button color="inherit" component={Link} to="/support">
                 Support
               </Button>
+              {isAdmin && (
+                <Button color="inherit" component={Link} to="/admin">
+                  Admin
+                </Button>
+              )}
             </Box>
           )}
           <AuthButton />
@@ -129,6 +146,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/product" element={<Product />} />
+        <Route path="/admin" element={isAdmin ? <AdminPage /> : <h1>Access Denied</h1>} />
         <Route path="*" element={<h1>Sorry</h1>} />
         <Route path="posts" element={<Posts />} />
       </Routes>

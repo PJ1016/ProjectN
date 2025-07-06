@@ -1,8 +1,14 @@
-import { createContext, useContext, useEffect, useState } from 'react';
-import { signInWithPopup, signOut, onAuthStateChanged, type User } from 'firebase/auth';
-import { useDispatch } from 'react-redux';
-import { auth, googleProvider } from '../firebase';
-import { setUser, clearUser } from '../store/authSlice';
+import { createContext, useContext, useEffect, useState } from "react";
+import {
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged,
+  type User,
+} from "firebase/auth";
+import { useDispatch } from "react-redux";
+import { auth, googleProvider } from "../firebase";
+import { setUser, clearUser } from "../store/authSlice";
+import { setAdminStatus } from "../store/adminSlice";
 
 interface AuthContextType {
   user: User | null;
@@ -14,7 +20,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within AuthProvider');
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 };
 
@@ -24,11 +30,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signInWithGoogle = async () => {
     try {
-      console.log('Starting Google sign-in...');
+      console.log("Starting Google sign-in...");
       const result = await signInWithPopup(auth, googleProvider);
-      console.log('Sign-in successful:', result.user);
+      console.log("Sign-in successful:", result.user);
     } catch (error) {
-      console.error('Sign-in error:', error);
+      console.error("Sign-in error:", error);
     }
   };
 
@@ -41,14 +47,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUserState(user);
       if (user) {
-        dispatch(setUser({
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-        }));
+        dispatch(
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+          })
+        );
+        // Check if user is admin (replace with your admin email)
+        const isAdmin = user.email === "praveen.jayanth.1111@gmail.com";
+        dispatch(setAdminStatus(isAdmin));
       } else {
         dispatch(clearUser());
+        dispatch(setAdminStatus(false));
       }
     });
     return unsubscribe;
