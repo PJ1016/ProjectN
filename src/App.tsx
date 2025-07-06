@@ -33,12 +33,23 @@ function App() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  usePageView();
+  
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Router>
-        <AppBar position="static">
+        <AppContent anchorEl={anchorEl} handleMenuOpen={handleMenuOpen} handleMenuClose={handleMenuClose} isMobile={isMobile} />
+      </Router>
+    </ThemeProvider>
+  );
+}
+
+function AppContent({ anchorEl, handleMenuOpen, handleMenuClose, isMobile }: any) {
+  usePageView();
+  
+  return (
+    <>
+      <AppBar position="static">
           <Toolbar>
             <Typography
               variant="h5"
@@ -107,8 +118,7 @@ function App() {
           <Route path="*" element={<h1>Sorry</h1>} />
           <Route path="posts" element={<Posts />} />
         </Routes>
-      </Router>
-    </ThemeProvider>
+    </>
   );
 }
 
