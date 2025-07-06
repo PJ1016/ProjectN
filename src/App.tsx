@@ -18,6 +18,8 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Product from "./components/Product";
 import HomePage from "./containers/HomePage";
 import { theme } from "./components/theme";
+import { Posts } from "./services/posts";
+import { usePageView } from "./services/usePageView";
 
 function App() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -31,7 +33,7 @@ function App() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-
+  usePageView();
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -103,6 +105,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/product" element={<Product />} />
           <Route path="*" element={<h1>Sorry</h1>} />
+          <Route path="posts" element={<Posts />} />
         </Routes>
       </Router>
     </ThemeProvider>
