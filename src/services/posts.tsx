@@ -1,4 +1,4 @@
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, getDocs, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../firebase";
 
@@ -35,7 +35,9 @@ export const Posts = () => {
       <ul>
         {posts.map((post) => (
           <li key={post.id}>
-            {Object.values(post).filter((_, index) => Object.keys(post)[index] !== 'id').join(', ')}
+            {Object.values(post)
+              .filter((_, index) => Object.keys(post)[index] !== "id")
+              .join(", ")}
           </li>
         ))}
       </ul>

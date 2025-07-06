@@ -6,7 +6,7 @@ export const theme = createTheme({
     h1: {
       fontFamily: "Playfair Display, serif",
       fontWeight: 600,
-      color: "#2A5945",
+      color: "#d63384",
     },
     button: {
       fontFamily: "Poppins, sans-serif",
@@ -16,21 +16,21 @@ export const theme = createTheme({
   },
   palette: {
     background: {
-      default: "#F4FBF7",
-      paper: "#E6F2EA",
+      default: "#fef7f7",
+      paper: "#fff0f6",
     },
     primary: {
-      main: "#5CA183",
+      main: "#ff6b9d",
     },
     secondary: {
-      main: "#D9F0E4",
+      main: "#ffc1cc",
     },
     text: {
-      primary: "#2E3C32",
-      secondary: "#6D8E7E",
+      primary: "#495057",
+      secondary: "#6c757d",
     },
   },
   shape: {
-    borderRadius: 8,
+    borderRadius: 12,
   },
 });

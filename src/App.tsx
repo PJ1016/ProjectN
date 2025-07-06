@@ -11,8 +11,10 @@ import {
   MenuItem,
   useMediaQuery,
   useTheme,
+  Avatar,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import { Spa } from "@mui/icons-material";
 import { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Product from "./components/Product";
@@ -20,8 +22,27 @@ import HomePage from "./containers/HomePage";
 import { theme } from "./components/theme";
 import { Posts } from "./services/posts";
 import { usePageView } from "./services/usePageView";
+import { AuthProvider } from "./contexts/AuthContext";
+import { Provider } from "react-redux";
+import { store } from "./store";
+import { AuthButton } from "./components/AuthButton";
 
 function App() {
+  return (
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AuthProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </AuthProvider>
+      </ThemeProvider>
+    </Provider>
+  );
+}
+
+function AppContent() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const muiTheme = useTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down("md"));
@@ -33,91 +54,84 @@ function App() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <AppContent anchorEl={anchorEl} handleMenuOpen={handleMenuOpen} handleMenuClose={handleMenuClose} isMobile={isMobile} />
-      </Router>
-    </ThemeProvider>
-  );
-}
 
-function AppContent({ anchorEl, handleMenuOpen, handleMenuClose, isMobile }: any) {
   usePageView();
-  
+
   return (
     <>
       <AppBar position="static">
-          <Toolbar>
+        <Toolbar>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, gap: 1 }}>
+            <Spa sx={{ color: 'success.main', fontSize: 32 }} />
             <Typography
               variant="h5"
               component="div"
-              sx={{ flexGrow: 1, fontWeight: "bold" }}
+              sx={{ fontWeight: "bold", color: 'white' }}
             >
-              Project #N
+              PureFlow
             </Typography>
-            {isMobile ? (
-              <>
-                <IconButton color="inherit" onClick={handleMenuOpen}>
-                  <MenuIcon />
-                </IconButton>
-                <Menu
-                  anchorEl={anchorEl}
-                  open={Boolean(anchorEl)}
-                  onClose={handleMenuClose}
-                >
-                  <MenuItem component={Link} to="/" onClick={handleMenuClose}>
-                    Home
-                  </MenuItem>
-                  <MenuItem
-                    component={Link}
-                    to="/product"
-                    onClick={handleMenuClose}
-                  >
-                    Products
-                  </MenuItem>
-                  <MenuItem
-                    component={Link}
-                    to="/safety"
-                    onClick={handleMenuClose}
-                  >
-                    Safety Resources
-                  </MenuItem>
-                  <MenuItem
-                    component={Link}
-                    to="/support"
-                    onClick={handleMenuClose}
-                  >
-                    Support
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <Box sx={{ display: "flex", gap: 2 }}>
-                <Button color="inherit" component={Link} to="/">
+          </Box>
+          {isMobile ? (
+            <>
+              <IconButton color="inherit" onClick={handleMenuOpen}>
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem component={Link} to="/" onClick={handleMenuClose}>
                   Home
-                </Button>
-                <Button color="inherit" component={Link} to="/product">
+                </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/product"
+                  onClick={handleMenuClose}
+                >
                   Products
-                </Button>
-                <Button color="inherit" component={Link} to="/safety">
+                </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/safety"
+                  onClick={handleMenuClose}
+                >
                   Safety Resources
-                </Button>
-                <Button color="inherit" component={Link} to="/support">
+                </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/support"
+                  onClick={handleMenuClose}
+                >
                   Support
-                </Button>
-              </Box>
-            )}
-          </Toolbar>
-        </AppBar>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/product" element={<Product />} />
-          <Route path="*" element={<h1>Sorry</h1>} />
-          <Route path="posts" element={<Posts />} />
-        </Routes>
+                </MenuItem>
+              </Menu>
+            </>
+          ) : (
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Button color="inherit" component={Link} to="/">
+                Home
+              </Button>
+              <Button color="inherit" component={Link} to="/product">
+                Products
+              </Button>
+              <Button color="inherit" component={Link} to="/safety">
+                Safety Resources
+              </Button>
+              <Button color="inherit" component={Link} to="/support">
+                Support
+              </Button>
+            </Box>
+          )}
+          <AuthButton />
+        </Toolbar>
+      </AppBar>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/product" element={<Product />} />
+        <Route path="*" element={<h1>Sorry</h1>} />
+        <Route path="posts" element={<Posts />} />
+      </Routes>
     </>
   );
 }
