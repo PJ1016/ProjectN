@@ -9,6 +9,8 @@ import { useDispatch } from "react-redux";
 import { auth, googleProvider } from "../firebase";
 import { setUser, clearUser } from "../store/authSlice";
 import { setAdminStatus } from "../store/adminSlice";
+import { PhoneNumberDialog } from "../components/PhoneNumberDialog";
+import { userService } from "../services/userService";
 
 interface AuthContextType {
   user: User | null;
@@ -26,6 +28,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUserState] = useState<User | null>(null);
+  const [showPhoneDialog, setShowPhoneDialog] = useState(false);
   const dispatch = useDispatch();
 
   const signInWithGoogle = async () => {
@@ -43,10 +46,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch(clearUser());
   };
 
+  const handlePhoneNumberSubmit = async (phoneNumber: string) => {
+    if (user) {
+      await userService.saveUserProfile({
+        uid: user.uid,
+        email: user.email!,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        phoneNumber,
+      });
+    }
+    setShowPhoneDialog(false);
+  };
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUserState(user);
       if (user) {
+        console.log("user", user);
         dispatch(
           setUser({
             uid: user.uid,
@@ -55,7 +72,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             photoURL: user.photoURL,
           })
         );
-        // Check if user is admin (replace with your admin email)
+        
+        // Check if user profile exists and has phone number
+        const userProfile = await userService.getUserProfile(user.uid);
+        if (!userProfile?.phoneNumber) {
+          setShowPhoneDialog(true);
+        }
+        
+        // Check if user is admin
         const isAdmin = [
           "praveen.jayanth.1111@gmail.com",
           "drmounikaupputuri@gmail.com",
@@ -72,6 +96,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthContext.Provider value={{ user, signInWithGoogle, logout }}>
       {children}
+      <PhoneNumberDialog
+        open={showPhoneDialog}
+        onClose={() => setShowPhoneDialog(false)}
+        onSubmit={handlePhoneNumberSubmit}
+        userEmail={user?.email || undefined}
+      />
     </AuthContext.Provider>
   );
 };
