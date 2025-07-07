@@ -56,7 +56,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           })
         );
         // Check if user is admin (replace with your admin email)
-        const isAdmin = user.email === "praveen.jayanth.1111@gmail.com";
+        const isAdmin = [
+          "praveen.jayanth.1111@gmail.com",
+          "drmounikaupputuri@gmail.com",
+        ].includes(user.email as string);
         dispatch(setAdminStatus(isAdmin));
       } else {
         dispatch(clearUser());
