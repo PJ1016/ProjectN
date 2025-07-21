@@ -60,11 +60,21 @@ const ProductDetails = ({ productDetails }: IProductDetails) => {
       <Box>
         <Typography
           variant={{ xs: "h5", md: "h4" }}
-          sx={{ color: "primary.main", fontWeight: 700, mb: 1, fontSize: { xs: '1.5rem', md: '2.125rem' } }}
+          sx={{
+            color: "primary.main",
+            fontWeight: 700,
+            mb: 1,
+            fontSize: { xs: "1.5rem", md: "2.125rem" },
+          }}
         >
           {productName}
         </Typography>
-        <Stack direction={{ xs: "column", sm: "row" }} gap={1} mb={2} flexWrap="wrap">
+        <Stack
+          direction={{ xs: "column", sm: "row" }}
+          gap={1}
+          mb={2}
+          flexWrap="wrap"
+        >
           <Chip
             icon={<Verified />}
             label="Certified Organic"

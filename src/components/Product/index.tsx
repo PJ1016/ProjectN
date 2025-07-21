@@ -12,6 +12,7 @@ import {
   Rating,
   Stack,
   Badge,
+  Divider,
 } from "@mui/material";
 import { useState } from "react";
 import {
@@ -56,19 +57,19 @@ const Product = () => {
           ← Back to Products
         </Button>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={6} md={6}>
             <Box
               sx={{
                 p: { xs: 1, sm: 2 },
                 bgcolor: "linear-gradient(45deg, #ffeef4, #fff0f6)",
                 borderRadius: 3,
-                minHeight: { xs: 300, md: 500 }
+                minHeight: { xs: 300, md: 500 },
               }}
             >
               <ProductImageGallery productImage={selectedProduct.imageUrl} />
             </Box>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={6} md={6}>
             <Box
               sx={{
                 p: { xs: 1, sm: 2 },
@@ -97,77 +98,138 @@ const Product = () => {
   }
 
   return (
-    <Container sx={{ py: 6 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 6 } }}>
       {/* Hero Section */}
-      <Box sx={{ textAlign: "center", mb: { xs: 4, md: 6 }, px: { xs: 1, sm: 0 } }}>
+      <Box
+        sx={{
+          textAlign: "center",
+          mb: { xs: 4, md: 6 },
+          px: { xs: 2, sm: 4, md: 0 },
+          py: { xs: 4, md: 6 },
+          background:
+            "linear-gradient(135deg, #ffeef4 0%, #fff0f6 50%, #f3e5f5 100%)",
+          borderRadius: 4,
+          position: "relative",
+          "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "4px",
+            background: "linear-gradient(90deg, #e91e63, #f06292, #ba68c8)",
+          },
+        }}
+      >
         <Typography
           variant={{ xs: "h4", md: "h3" }}
           sx={{
-            color: "primary.main",
-            fontWeight: 700,
-            mb: 2,
+            fontWeight: 800,
+            mb: { xs: 2, md: 3 },
             background: "linear-gradient(45deg, #e91e63, #f06292)",
             backgroundClip: "text",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
+            letterSpacing: "-0.02em",
           }}
         >
           🌿 Pure Organic Collection
         </Typography>
+        <Divider />
         <Typography
           variant={{ xs: "body1", md: "h6" }}
-          color="text.secondary"
-          sx={{ mb: 3, maxWidth: 600, mx: "auto", px: { xs: 2, sm: 0 } }}
+          sx={{
+            mb: { xs: 3, md: 4 },
+            maxWidth: 700,
+            mx: "auto",
+            color: "text.secondary",
+            lineHeight: 1.6,
+            fontSize: { xs: "1rem", md: "1.2rem" },
+          }}
         >
           Discover our premium range of organic sanitary pads, crafted with love
           for your natural cycle
         </Typography>
         <Stack
           direction={{ xs: "column", sm: "row" }}
-          spacing={1}
+          spacing={{ xs: 1, sm: 2 }}
           justifyContent="center"
           alignItems="center"
-          sx={{ gap: 1 }}
+          sx={{ flexWrap: "wrap", gap: { xs: 1, sm: 2 } }}
         >
           <Chip
-            icon={<Verified />}
+            icon={<Verified sx={{ fontSize: 18 }} />}
             label="Certified Organic"
-            sx={{ bgcolor: "success.light", color: "white" }}
+            sx={{
+              bgcolor: "success.main",
+              color: "white",
+              fontWeight: 600,
+              px: 2,
+              py: 0.5,
+            }}
           />
           <Chip
-            icon={<Nature />}
+            icon={<Nature sx={{ fontSize: 18 }} />}
             label="100% Natural"
-            sx={{ bgcolor: "primary.light", color: "white" }}
+            sx={{
+              bgcolor: "primary.main",
+              color: "white",
+              fontWeight: 600,
+              px: 2,
+              py: 0.5,
+            }}
           />
           <Chip
-            icon={<LocalShipping />}
+            icon={<LocalShipping sx={{ fontSize: 18 }} />}
             label="Free Shipping"
-            sx={{ bgcolor: "secondary.light", color: "primary.main" }}
+            sx={{
+              bgcolor: "secondary.main",
+              color: "white",
+              fontWeight: 600,
+              px: 2,
+              py: 0.5,
+            }}
           />
         </Stack>
       </Box>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={{ xs: 3, md: 4 }} sx={{ mb: { xs: 6, md: 8 } }}>
         {products.map((product) => (
           <Grid item xs={12} sm={6} md={4} key={product.id}>
             <Card
+              elevation={2}
               sx={{
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 cursor: "pointer",
-                borderRadius: 3,
+                borderRadius: 4,
                 overflow: "hidden",
                 position: "relative",
                 background: "linear-gradient(145deg, #ffffff 0%, #fef7f7 100%)",
-                border: "1px solid",
-                borderColor: "primary.light",
+                border: "2px solid transparent",
                 "&:hover": {
-                  transform: "translateY(-8px)",
-                  boxShadow: "0 12px 40px rgba(255, 107, 157, 0.2)",
+                  transform: "translateY(-12px) scale(1.02)",
+                  boxShadow: "0 20px 60px rgba(233, 30, 99, 0.25)",
+                  border: "2px solid",
                   borderColor: "primary.main",
                 },
-                transition: "all 0.4s ease",
+                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: "3px",
+                  background:
+                    "linear-gradient(90deg, #e91e63, #f06292, #ba68c8)",
+                  opacity: 0,
+                  transition: "opacity 0.3s ease",
+                },
+                "&:hover::before": {
+                  opacity: 1,
+                },
               }}
               onClick={() => setSelectedProduct(product)}
             >
@@ -177,16 +239,14 @@ const Product = () => {
                   badgeContent={`${product.discount}% OFF`}
                   sx={{
                     position: "absolute",
-                    top: 16,
-                    right: 16,
+                    top: 30,
+                    right: 26,
                     zIndex: 1,
                     "& .MuiBadge-badge": {
                       bgcolor: "error.main",
                       color: "white",
-                      fontWeight: 600,
                       fontSize: "0.75rem",
-                      padding: "4px 8px",
-                      borderRadius: 2,
+                      padding: "14px 14px",
                     },
                   }}
                 />
@@ -203,7 +263,7 @@ const Product = () => {
                     sx={{
                       transition: "transform 0.4s ease",
                       "&:hover": { transform: "scale(1.05)" },
-                      objectFit: 'cover'
+                      objectFit: "cover",
                     }}
                   />
                 ) : (
@@ -223,7 +283,15 @@ const Product = () => {
                 )}
               </Box>
 
-              <CardContent sx={{ flexGrow: 1, p: { xs: 2, sm: 3 } }}>
+              <CardContent
+                sx={{
+                  flexGrow: 1,
+                  p: { xs: 3, sm: 4 },
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1.5,
+                }}
+              >
                 {/* Product Title */}
                 <Typography
                   variant="h6"
@@ -348,7 +416,7 @@ const Product = () => {
                       product.stock > 0
                         ? "linear-gradient(45deg, #4caf50, #66bb6a)"
                         : "grey.300",
-                    color: 'white',
+                    color: "white",
                     py: 1.5,
                     fontSize: "16px",
                     fontWeight: 600,
