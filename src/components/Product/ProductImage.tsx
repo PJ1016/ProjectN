@@ -1,14 +1,7 @@
 import { Box, Stack, useMediaQuery, useTheme } from "@mui/material";
-import React, { useState } from "react";
-
-const productImages = [
-  "https://i0.wp.com/papayain.com/wp-content/uploads/2022/01/1-1-scaled.jpg?fit=2560%2C1707&ssl=1",
-  "https://images.pexels.com/photos/5938365/pexels-photo-5938365.jpeg",
-  "https://images.pexels.com/photos/5938366/pexels-photo-5938366.jpeg",
-];
+import React from "react";
 
 const ProductImageGallery = ({ productImage }: { productImage?: string }) => {
-  const [selectedImage, setSelectedImage] = useState(productImage || productImages[0]);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -18,35 +11,6 @@ const ProductImageGallery = ({ productImage }: { productImage?: string }) => {
       spacing={2}
       alignItems={isMobile ? "center" : "flex-start"}
     >
-      {/* Thumbnails (left on desktop, top on mobile) */}
-      <Stack
-        direction={isMobile ? "row" : "column"}
-        spacing={1}
-        justifyContent="center"
-        flexWrap="wrap"
-      >
-        {productImages.map((img, index) => (
-          <Box
-            key={index}
-            component="img"
-            src={img}
-            alt={`Thumbnail ${index + 1}`}
-            onClick={() => setSelectedImage(img)}
-            sx={{
-              width: 60,
-              height: 60,
-              borderRadius: 1,
-              objectFit: "cover",
-              border:
-                img === selectedImage ? "2px solid #C2185B" : "1px solid #ccc",
-              cursor: "pointer",
-              transition: "border 0.2s",
-            }}
-          />
-        ))}
-      </Stack>
-
-      {/* Main Image */}
       <Box
         sx={{
           width: "100%",
@@ -59,7 +23,7 @@ const ProductImageGallery = ({ productImage }: { productImage?: string }) => {
         }}
       >
         <img
-          src={productImage || selectedImage}
+          src={productImage}
           alt="Sanitary Pad Product"
           style={{
             width: "100%",

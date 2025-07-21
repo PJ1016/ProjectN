@@ -1,4 +1,4 @@
-import { collection, addDoc, updateDoc, doc, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, getDocs, query, orderBy, Timestamp, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 // Helper function to convert Firestore Timestamp to serializable date
@@ -74,4 +74,7 @@ export const firestoreService = {
       stock,
       updatedAt: new Date(),
     }),
+    
+  deleteProduct: (id: string) =>
+    deleteDoc(doc(db, PRODUCTS_COLLECTION, id)),
 };

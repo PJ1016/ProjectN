@@ -1,4 +1,4 @@
-import { Add, Edit, CloudUpload } from "@mui/icons-material";
+import { Add, Edit, CloudUpload, Delete } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import {
   Box,
@@ -21,16 +21,21 @@ import {
   useAddProductMutation,
   useUpdateProductMutation,
   useUpdateStockMutation,
+  useDeleteProductMutation,
 } from "../store/api";
 import { type Product } from "../services/firestoreService";
 import { storageService } from "../services/storageService";
 import { apiConfig } from "../config/api";
 
 export default function AdminPage() {
-  const { data: products = [], isLoading } = useGetProductsQuery();
-  const [addProduct] = useAddProductMutation();
-  const [updateProduct] = useUpdateProductMutation();
-  const [updateStock] = useUpdateStockMutation();
+  const { data: products = [], isLoading: isLoadingProducts } = useGetProductsQuery();
+  const [addProduct, { isLoading: isAddingProduct }] = useAddProductMutation();
+  const [updateProduct, { isLoading: isUpdatingProduct }] = useUpdateProductMutation();
+  const [updateStock, { isLoading: isUpdatingStock }] = useUpdateStockMutation();
+  const [deleteProduct, { isLoading: isDeletingProduct }] = useDeleteProductMutation();
+  
+  // Combined loading state for any API operation
+  const isLoading = isLoadingProducts || isAddingProduct || isUpdatingProduct || isUpdatingStock || isDeletingProduct;
 
   const [open, setOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -210,6 +215,16 @@ export default function AdminPage() {
     });
     setOpen(true);
   };
+  
+  const handleDelete = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(id);
+      } catch (error: any) {
+        setError(`Error deleting product: ${error.message || "Unknown error"}`);
+      }
+    }
+  };
 
   if (isLoading)
     return (
@@ -271,7 +286,7 @@ export default function AdminPage() {
                   color="text.secondary"
                   sx={{ mb: 2 }}
                 >
-                  {product.description}
+                  {product.description.substring(0, 100)}...
                 </Typography>
                 <Box
                   sx={{
@@ -290,12 +305,11 @@ export default function AdminPage() {
                           product.discount > 0 ? "text.secondary" : "inherit",
                       }}
                     >
-                      ${product.price}
+                      ₹{product.price}
                     </Typography>
                     {product.discount > 0 && (
                       <Typography variant="h6" sx={{ color: "error.main" }}>
-                        $
-                        {(product.price * (1 - product.discount / 100)).toFixed(
+                        ₹{(product.price * (1 - product.discount / 100)).toFixed(
                           2
                         )}
                       </Typography>
@@ -310,26 +324,42 @@ export default function AdminPage() {
                     Stock: {product.stock}
                   </Typography>
                 </Box>
-                <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-                  <Button
-                    size="small"
-                    startIcon={<Edit />}
-                    onClick={() => handleEdit(product)}
-                  >
-                    Edit
-                  </Button>
-                  <TextField
-                    size="small"
-                    type="number"
-                    defaultValue={product.stock}
-                    onBlur={(e) =>
-                      updateStock({
-                        id: product.id!,
-                        stock: parseInt(e.target.value),
-                      })
-                    }
-                    sx={{ width: 80 }}
-                  />
+                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+                    <TextField
+                      size="small"
+                      type="number"
+                      defaultValue={product.stock}
+                      disabled={isUpdatingStock}
+                      onBlur={(e) =>
+                        updateStock({
+                          id: product.id!,
+                          stock: parseInt(e.target.value),
+                        })
+                      }
+                      sx={{ width: 80 }}
+                    />
+                  </Box>
+                  <Box>
+                    <Button
+                      size="small"
+                      startIcon={<Edit />}
+                      onClick={() => handleEdit(product)}
+                      disabled={isUpdatingProduct || isDeletingProduct}
+                      sx={{ mr: 1 }}
+                    >
+                      {isUpdatingProduct ? <CircularProgress size={16} /> : "Edit"}
+                    </Button>
+                    <Button
+                      size="small"
+                      color="error"
+                      startIcon={isDeletingProduct ? null : <Delete />}
+                      onClick={() => handleDelete(product.id!)}
+                      disabled={isUpdatingProduct || isDeletingProduct}
+                    >
+                      {isDeletingProduct ? <CircularProgress size={16} /> : "Delete"}
+                    </Button>
+                  </Box>
                 </Box>
               </CardContent>
             </Card>

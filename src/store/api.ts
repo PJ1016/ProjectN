@@ -38,6 +38,13 @@ export const productsApi = createApi({
           .then(() => ({ data: undefined })),
       invalidatesTags: ["Product"],
     }),
+    deleteProduct: builder.mutation<void, string>({
+      queryFn: (id) =>
+        firestoreService
+          .deleteProduct(id)
+          .then(() => ({ data: undefined })),
+      invalidatesTags: ["Product"],
+    }),
   }),
 });
 
@@ -46,4 +53,5 @@ export const {
   useAddProductMutation,
   useUpdateProductMutation,
   useUpdateStockMutation,
+  useDeleteProductMutation,
 } = productsApi;
