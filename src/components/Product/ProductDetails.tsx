@@ -22,6 +22,8 @@ import {
   Favorite,
   Star,
 } from "@mui/icons-material";
+import AddToCartButton from "../Cart/AddToCartButton";
+import type { Product } from "../../services/firestoreService";
 import OptionGroup from "../OptionGroup";
 import { QuantitySelector } from "../QuantitySelector";
 import { PriceDisplay } from "./PriceDisplay";
@@ -34,9 +36,10 @@ interface IProductDetails {
     productFeatures: string[];
     productShipping: string;
   };
+  product?: Product;
 }
 
-const ProductDetails = ({ productDetails }: IProductDetails) => {
+const ProductDetails = ({ productDetails, product }: IProductDetails) => {
   const {
     productName,
     productMRP,
@@ -187,25 +190,34 @@ const ProductDetails = ({ productDetails }: IProductDetails) => {
         >
           Buy Now - Fast Delivery
         </Button>
-        <Button
-          variant="outlined"
-          size="large"
-          startIcon={<ShoppingBag />}
-          sx={{
-            borderColor: "primary.main",
-            color: "primary.main",
-            py: 1.5,
-            fontSize: "16px",
-            fontWeight: 600,
-            borderRadius: 3,
-            "&:hover": {
-              bgcolor: "primary.light",
+        {product ? (
+          <AddToCartButton 
+            product={product}
+            quantity={formData.quantity}
+            size={formData.size}
+            packSize={formData.itemType}
+          />
+        ) : (
+          <Button
+            variant="outlined"
+            size="large"
+            startIcon={<ShoppingBag />}
+            sx={{
               borderColor: "primary.main",
-            },
-          }}
-        >
-          Add to Cart
-        </Button>
+              color: "primary.main",
+              py: 1.5,
+              fontSize: "16px",
+              fontWeight: 600,
+              borderRadius: 3,
+              "&:hover": {
+                bgcolor: "primary.light",
+                borderColor: "primary.main",
+              },
+            }}
+          >
+            Add to Cart
+          </Button>
+        )}
       </Stack>
 
       {/* Product Features */}

@@ -1,7 +1,14 @@
 import { Box, Stack, useMediaQuery, useTheme } from "@mui/material";
 import React from "react";
+import AddToCartButton from "../Cart/AddToCartButton";
+import type { Product } from "../../services/firestoreService";
 
-const ProductImageGallery = ({ productImage }: { productImage?: string }) => {
+interface ProductImageGalleryProps {
+  productImage?: string;
+  product?: Product;
+}
+
+const ProductImageGallery = ({ productImage, product }: ProductImageGalleryProps) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -20,6 +27,7 @@ const ProductImageGallery = ({ productImage }: { productImage?: string }) => {
           borderRadius: 2,
           boxShadow: 2,
           bgcolor: "#fff",
+          position: "relative",
         }}
       >
         <img
@@ -34,6 +42,16 @@ const ProductImageGallery = ({ productImage }: { productImage?: string }) => {
           onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
           onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
         />
+        
+        {product && (
+          <AddToCartButton 
+            product={product}
+            variant="icon"
+            position="absolute"
+            top={16}
+            right={16}
+          />
+        )}
       </Box>
     </Stack>
   );

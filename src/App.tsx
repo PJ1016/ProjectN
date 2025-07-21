@@ -12,6 +12,7 @@ import {
   useMediaQuery,
   useTheme,
   Avatar,
+  Divider,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Spa } from "@mui/icons-material";
@@ -28,6 +29,8 @@ import { store } from "./store";
 import { AuthButton } from "./components/AuthButton";
 import AdminPage from "./containers/AdminPage";
 import { useAppSelector } from "./store/hooks";
+import { CartIcon } from "./components/Cart";
+import Cart from "./pages/Cart";
 
 function App() {
   return (
@@ -108,6 +111,13 @@ function AppContent() {
                 >
                   Support
                 </MenuItem>
+                <MenuItem
+                  component={Link}
+                  to="/cart"
+                  onClick={handleMenuClose}
+                >
+                  Cart
+                </MenuItem>
                 {isAdmin && (
                   <MenuItem
                     component={Link}
@@ -140,12 +150,16 @@ function AppContent() {
               )}
             </Box>
           )}
-          <AuthButton />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <CartIcon />
+            <AuthButton />
+          </Box>
         </Toolbar>
       </AppBar>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/product" element={<Product />} />
+        <Route path="/cart" element={<Cart />} />
         <Route path="/admin" element={isAdmin ? <AdminPage /> : <h1>Access Denied</h1>} />
         <Route path="*" element={<h1>Sorry</h1>} />
         <Route path="posts" element={<Posts />} />

@@ -66,7 +66,10 @@ const Product = () => {
                 minHeight: { xs: 300, md: 500 },
               }}
             >
-              <ProductImageGallery productImage={selectedProduct.imageUrl} />
+              <ProductImageGallery 
+                productImage={selectedProduct.imageUrl} 
+                product={selectedProduct} 
+              />
             </Box>
           </Grid>
           <Grid xs={6} md={6}>
@@ -78,7 +81,10 @@ const Product = () => {
                 boxShadow: 2,
               }}
             >
-              <ProductDetails productDetails={productDetails} />
+              <ProductDetails 
+                productDetails={productDetails} 
+                product={selectedProduct} 
+              />
             </Box>
           </Grid>
         </Grid>

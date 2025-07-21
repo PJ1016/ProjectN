@@ -13,6 +13,9 @@ import {
   Stack,
   LinearProgress,
 } from "@mui/material";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import {
   Nature,
   Favorite,
@@ -28,6 +31,18 @@ import { HeroSection } from "../components/HeroSection";
 import { TestimonialSection } from "../components/TestimonialSection";
 
 export default function HomePage() {
+  const location = useLocation();
+  const { signInWithGoogle } = useAuth();
+
+  // Check for showLogin query parameter
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    if (searchParams.get("showLogin") === "true") {
+      // Trigger Google sign-in
+      signInWithGoogle();
+    }
+  }, [location.search, signInWithGoogle]);
+
   const features = [
     {
       icon: <Shield sx={{ fontSize: 48, color: "success.main" }} />,
