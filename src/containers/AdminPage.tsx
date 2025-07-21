@@ -1,21 +1,21 @@
+import { Add, Edit, CloudUpload } from "@mui/icons-material";
+import { useState, useEffect } from "react";
 import {
-  Container,
-  Typography,
-  Button,
   Box,
+  Button,
   Card,
   CardContent,
-  TextField,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  CircularProgress,
   CardMedia,
+  CircularProgress,
+  Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  TextField,
+  Typography,
 } from "@mui/material";
-import { Add, Edit, CloudUpload } from "@mui/icons-material";
-import { useState } from "react";
 import {
   useGetProductsQuery,
   useAddProductMutation,
@@ -24,6 +24,7 @@ import {
 } from "../store/api";
 import { type Product } from "../services/firestoreService";
 import { storageService } from "../services/storageService";
+import { apiConfig } from "../config/api";
 
 export default function AdminPage() {
   const { data: products = [], isLoading } = useGetProductsQuery();
@@ -35,6 +36,31 @@ export default function AdminPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [apiAvailable, setApiAvailable] = useState<boolean | null>(null);
+
+  // Check if Python API is available
+  useEffect(() => {
+    const checkApiAvailability = async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
+        const response = await fetch(apiConfig.endpoints.health, {
+          method: "GET",
+          signal: controller.signal,
+        }).catch(() => null);
+
+        clearTimeout(timeoutId);
+        setApiAvailable(!!response && response.ok);
+      } catch (error) {
+        console.log("API check failed:", error);
+        setApiAvailable(false);
+      }
+    };
+
+    checkApiAvailability();
+  }, []);
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -47,7 +73,75 @@ export default function AdminPage() {
   const handleSubmit = async () => {
     try {
       setUploading(true);
-      
+
+      let imageUrl =
+        editingProduct?.imageUrl ||
+        "https://firebasestorage.googleapis.com/v0/b/projectn-daee6.appspot.com/o/placeholder.png?alt=media";
+
+      // Upload image if selected using Python API
+      if (imageFile) {
+        try {
+          const formData = new FormData();
+          formData.append("file", imageFile);
+
+          console.log("Uploading image to Python API...");
+
+          // Set a timeout for the fetch request
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+          try {
+            const response = await fetch(apiConfig.endpoints.upload, {
+              method: "POST",
+              body: formData,
+              signal: controller.signal,
+            });
+
+            clearTimeout(timeoutId); // Clear the timeout
+
+            console.log("Response status:", response.status);
+            const responseText = await response.text();
+            console.log("Response body:", responseText);
+
+            if (!response.ok) {
+              let errorDetails = "Unknown error";
+              try {
+                const errorJson = JSON.parse(responseText);
+                errorDetails =
+                  errorJson.details ||
+                  errorJson.error ||
+                  errorJson.message ||
+                  "Unknown error";
+              } catch (e) {
+                errorDetails = responseText || `Status: ${response.status}`;
+              }
+              throw new Error(`Upload failed: ${errorDetails}`);
+            }
+
+            // Parse the response text as JSON
+            const data = JSON.parse(responseText);
+            imageUrl = data.imageUrl;
+            console.log("Image uploaded successfully:", imageUrl);
+          } catch (fetchError: any) {
+            clearTimeout(timeoutId);
+            if (fetchError.name === "AbortError") {
+              throw new Error(
+                "API request timed out. Is the Python server running?"
+              );
+            }
+            throw fetchError;
+          }
+        } catch (error: any) {
+          const errorMsg = `Failed to upload image: ${
+            error.message || "Unknown error"
+          }`;
+          console.error("Image upload error:", errorMsg);
+          setError(errorMsg);
+          console.log("Using placeholder image instead");
+          // Continue with placeholder image
+        }
+      }
+
       const productData = {
         name: formData.name,
         price: parseFloat(formData.price),
@@ -55,40 +149,56 @@ export default function AdminPage() {
         stock: parseInt(formData.stock),
         description: formData.description,
         category: formData.category,
-        imageUrl: editingProduct?.imageUrl || '',
+        imageUrl: imageUrl,
       };
 
-      console.log('Saving product:', productData);
+      console.log("Saving product:", productData);
 
-      if (editingProduct?.id) {
-        const result = await updateProduct({ id: editingProduct.id, product: productData });
-        console.log('Update result:', result);
-      } else {
-        const result = await addProduct(productData);
-        console.log('Add result:', result);
+      try {
+        if (editingProduct?.id) {
+          console.log("Updating product with ID:", editingProduct.id);
+          const result = await updateProduct({
+            id: editingProduct.id,
+            product: productData,
+          });
+          console.log("Update result:", result);
+        } else {
+          console.log("Adding new product");
+          const result = await addProduct(productData);
+          console.log("Add result:", result);
+        }
+
+        console.log("Product saved successfully");
+        setOpen(false);
+        setFormData({
+          name: "",
+          price: "",
+          discount: "",
+          stock: "",
+          description: "",
+          category: "",
+        });
+        setEditingProduct(null);
+        setImageFile(null);
+      } catch (error: any) {
+        const errorMsg = `Error saving product: ${
+          error.message || "Unknown error"
+        }`;
+        console.error(errorMsg, error);
+        setError(errorMsg);
       }
-
-      console.log('Product saved successfully');
-      setOpen(false);
-      setFormData({
-        name: "",
-        price: "",
-        discount: "",
-        stock: "",
-        description: "",
-        category: "",
-      });
-      setEditingProduct(null);
-      setImageFile(null);
-    } catch (error) {
-      console.error('Error submitting product:', error);
-      alert('Error saving product. Please try again.');
+    } catch (error: any) {
+      const errorMsg = `Error: ${error.message || "Unknown error"}`;
+      console.error("Error in handleSubmit:", errorMsg, error);
+      setError(errorMsg);
     } finally {
+      // Ensure uploading state is reset
       setUploading(false);
     }
   };
-
+  console.log("products", products);
   const handleEdit = (product: Product) => {
+    setError(null);
     setEditingProduct(product);
     setFormData({
       name: product.name,
@@ -138,14 +248,20 @@ export default function AdminPage() {
         {products.map((product) => (
           <Grid item xs={12} md={6} lg={4} key={product.id}>
             <Card sx={{ height: "100%" }}>
-              {product.imageUrl && (
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={product.imageUrl}
-                  alt={product.name}
-                />
-              )}
+              <CardMedia
+                component="img"
+                height="200"
+                image={
+                  product.imageUrl ||
+                  "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect fill='%23e9e9e9' width='300' height='200'/%3E%3Ctext fill='%23999999' font-family='Arial' font-size='14' x='50%' y='50%' text-anchor='middle' dominant-baseline='middle'%3EProduct Image%3C/text%3E%3C/svg%3E"
+                }
+                alt={product.name}
+                onError={(e) => {
+                  // If image fails to load, use inline SVG placeholder
+                  e.currentTarget.src =
+                    "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='200' viewBox='0 0 300 200'%3E%3Crect fill='%23e9e9e9' width='300' height='200'/%3E%3Ctext fill='%23999999' font-family='Arial' font-size='14' x='50%' y='50%' text-anchor='middle' dominant-baseline='middle'%3EProduct Image%3C/text%3E%3C/svg%3E";
+                }}
+              />
               <CardContent>
                 <Typography variant="h6" sx={{ color: "primary.main", mb: 1 }}>
                   {product.name}
@@ -289,15 +405,120 @@ export default function AdminPage() {
             sx={{ mb: 2 }}
           />
 
-          {/* Image upload temporarily disabled due to CORS issues */}
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Image upload temporarily disabled
-          </Typography>
+          {/* Image upload section - Using Python API */}
+          <Box sx={{ mb: 1 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                Images are uploaded via Python API to avoid CORS issues
+              </Typography>
+              <Box
+                sx={{
+                  ml: 1,
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  bgcolor:
+                    apiAvailable === true
+                      ? "success.main"
+                      : apiAvailable === false
+                      ? "error.main"
+                      : "grey.400",
+                }}
+              />
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ ml: 0.5 }}
+              >
+                {apiAvailable === true
+                  ? "API Connected"
+                  : apiAvailable === false
+                  ? "API Unavailable"
+                  : "Checking API..."}
+              </Typography>
+            </Box>
+
+            {apiAvailable === false && (
+              <Box
+                sx={{ p: 1, bgcolor: "warning.light", borderRadius: 1, mt: 1 }}
+              >
+                <Typography variant="caption" color="warning.dark">
+                  <strong>Python API server is not running.</strong> Image
+                  uploads will use placeholder images instead.
+                  <br />
+                  To enable image uploads, run the Python API server:
+                  <br />
+                  <code>cd api && python app.py</code>
+                </Typography>
+              </Box>
+            )}
+          </Box>
+          <Box sx={{ mb: 2 }}>
+            <Button
+              component="label"
+              variant="outlined"
+              startIcon={<CloudUpload />}
+              sx={{ mb: 1 }}
+            >
+              Upload Image
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+              />
+            </Button>
+            {imageFile && (
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="body2" sx={{ mb: 1 }}>
+                  Selected: {imageFile.name}
+                </Typography>
+                <img
+                  src={URL.createObjectURL(imageFile)}
+                  alt="Image preview"
+                  style={{ maxHeight: 100, maxWidth: "100%", display: "block" }}
+                />
+              </Box>
+            )}
+            {editingProduct?.imageUrl && !imageFile && (
+              <Box sx={{ mt: 1 }}>
+                <img
+                  src={editingProduct.imageUrl}
+                  alt="Current product"
+                  style={{ maxHeight: 100, maxWidth: "100%" }}
+                />
+              </Box>
+            )}
+          </Box>
         </DialogContent>
+        {error && (
+          <Box
+            sx={{
+              mx: 3,
+              mb: 2,
+              p: 1,
+              bgcolor: "error.light",
+              color: "error.contrastText",
+              borderRadius: 1,
+            }}
+          >
+            <Typography variant="body2">{error}</Typography>
+          </Box>
+        )}
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button
-            onClick={handleSubmit}
+            onClick={() => {
+              setOpen(false);
+              setError(null);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              setError(null);
+              handleSubmit();
+            }}
             variant="contained"
             disabled={uploading}
           >

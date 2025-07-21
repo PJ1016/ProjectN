@@ -57,7 +57,7 @@ const Product = () => {
           ← Back to Products
         </Button>
         <Grid container spacing={3}>
-          <Grid item xs={6} md={6}>
+          <Grid xs={6} md={6}>
             <Box
               sx={{
                 p: { xs: 1, sm: 2 },
@@ -69,7 +69,7 @@ const Product = () => {
               <ProductImageGallery productImage={selectedProduct.imageUrl} />
             </Box>
           </Grid>
-          <Grid item xs={6} md={6}>
+          <Grid xs={6} md={6}>
             <Box
               sx={{
                 p: { xs: 1, sm: 2 },
@@ -135,9 +135,8 @@ const Product = () => {
         >
           🌿 Pure Organic Collection
         </Typography>
-        <Divider />
+        <Divider sx={{ margin: "1rem" }} />
         <Typography
-          variant={{ xs: "body1", md: "h6" }}
           sx={{
             mb: { xs: 3, md: 4 },
             maxWidth: 700,
@@ -161,8 +160,8 @@ const Product = () => {
             icon={<Verified sx={{ fontSize: 18 }} />}
             label="Certified Organic"
             sx={{
-              bgcolor: "success.main",
-              color: "white",
+              bgcolor: "success.secondary",
+              color: "",
               fontWeight: 600,
               px: 2,
               py: 0.5,
@@ -193,91 +192,79 @@ const Product = () => {
         </Stack>
       </Box>
 
-      <Grid container spacing={{ xs: 3, md: 4 }} sx={{ mb: { xs: 6, md: 8 } }}>
+      <Grid container spacing={3} sx={{ mb: { xs: 6, md: 8 } }}>
         {products.map((product) => (
-          <Grid item xs={12} sm={6} md={4} key={product.id}>
+          <Grid xs={12} sm={6} md={3} key={product.id} sx={{ width: { xs: '100%', sm: '280px' } }}>
             <Card
-              elevation={2}
+              elevation={0}
               sx={{
-                height: "100%",
                 display: "flex",
                 flexDirection: "column",
+                height: "100%",
+                width: 280,
+                maxWidth: "100%",
                 cursor: "pointer",
-                borderRadius: 4,
                 overflow: "hidden",
                 position: "relative",
-                background: "linear-gradient(145deg, #ffffff 0%, #fef7f7 100%)",
-                border: "2px solid transparent",
+                bgcolor: "background.paper",
+                borderRadius: 1,
                 "&:hover": {
-                  transform: "translateY(-12px) scale(1.02)",
-                  boxShadow: "0 20px 60px rgba(233, 30, 99, 0.25)",
-                  border: "2px solid",
-                  borderColor: "primary.main",
+                  boxShadow: 3,
                 },
-                transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
-                "&::before": {
-                  content: '""',
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: "3px",
-                  background:
-                    "linear-gradient(90deg, #e91e63, #f06292, #ba68c8)",
-                  opacity: 0,
-                  transition: "opacity 0.3s ease",
-                },
-                "&:hover::before": {
-                  opacity: 1,
-                },
+                transition: "box-shadow 0.3s ease",
               }}
               onClick={() => setSelectedProduct(product)}
             >
               {/* Discount Badge */}
               {product.discount > 0 && (
-                <Badge
-                  badgeContent={`${product.discount}% OFF`}
+                <Chip
+                  label={`${product.discount}% OFF`}
+                  color="error"
+                  size="small"
                   sx={{
                     position: "absolute",
-                    top: 30,
-                    right: 26,
+                    top: 10,
+                    left: 10,
                     zIndex: 1,
-                    "& .MuiBadge-badge": {
-                      bgcolor: "error.main",
-                      color: "white",
-                      fontSize: "0.75rem",
-                      padding: "14px 14px",
-                    },
+                    fontWeight: 500,
                   }}
                 />
               )}
 
               {/* Product Image */}
-              <Box sx={{ position: "relative", overflow: "hidden" }}>
+              <Box
+                sx={{
+                  position: "relative",
+                  overflow: "hidden",
+                  height: 280,
+                  width: "100%",
+                }}
+              >
                 {product.imageUrl ? (
                   <CardMedia
                     component="img"
-                    height="240"
                     image={product.imageUrl}
                     alt={product.name}
                     sx={{
-                      transition: "transform 0.4s ease",
-                      "&:hover": { transform: "scale(1.05)" },
+                      height: "100%",
+                      width: "100%",
                       objectFit: "cover",
+                      transition: "transform 0.3s ease",
+                      "&:hover": { transform: "scale(1.04)" },
                     }}
                   />
                 ) : (
                   <Box
                     sx={{
-                      height: 240,
-                      bgcolor: "linear-gradient(45deg, #ffeef4, #fff0f6)",
+                      height: "100%",
+                      bgcolor: "grey.100",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
                     }}
                   >
-                    <Typography variant="h6" color="primary.main">
-                      🌸 {product.name}
+                    <Typography variant="body1" color="text.secondary">
+                      {product.name}
                     </Typography>
                   </Box>
                 )}
@@ -285,61 +272,110 @@ const Product = () => {
 
               <CardContent
                 sx={{
-                  flexGrow: 1,
-                  p: { xs: 3, sm: 4 },
+                  p: 2,
+                  pt: 1.5,
+                  pb: "12px !important",
                   display: "flex",
                   flexDirection: "column",
-                  gap: 1.5,
                 }}
               >
-                {/* Product Title */}
+                {/* Brand Name */}
                 <Typography
-                  variant="h6"
+                  variant="subtitle2"
                   sx={{
-                    color: "primary.main",
+                    fontWeight: 500,
+                    color: "text.primary",
+                    mb: 0.5,
+                  }}
+                >
+                  ORGANIC CARE
+                </Typography>
+
+                {/* Product Name */}
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
                     mb: 1,
-                    fontWeight: 600,
-                    lineHeight: 1.3,
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {product.name}
                 </Typography>
 
-                {/* Rating */}
-                <Stack direction="row" alignItems="center" gap={1} mb={1}>
-                  <Rating value={4.5} precision={0.5} readOnly size="small" />
-                  <Typography variant="caption" color="text.secondary">
-                    (4.5) • 1.2k reviews
-                  </Typography>
-                </Stack>
-
-                {/* Description */}
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
+                {/* Price and Discount */}
+                <Box
                   sx={{
-                    mb: 2,
-                    lineHeight: 1.5,
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    mt: 0.5,
                   }}
                 >
-                  {product.description}
-                </Typography>
+                  <Typography
+                    variant="subtitle2"
+                    sx={{ fontWeight: 500, fontSize: "14px", color: "#282c3f" }}
+                  >
+                    ₹
+                    {product.discount > 0
+                      ? Math.round(product.price * (1 - product.discount / 100))
+                      : product.price}
+                  </Typography>
 
-                {/* Category */}
-                <Chip
-                  label={product.category}
-                  size="small"
+                  {product.discount > 0 && (
+                    <>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          textDecoration: "line-through",
+                          color: "#7e818c",
+                          fontSize: "12px",
+                        }}
+                      >
+                        ₹{product.price}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "#ff3f6c",
+                          fontSize: "12px",
+                          fontWeight: 500,
+                        }}
+                      >
+                        ({product.discount}% OFF)
+                      </Typography>
+                    </>
+                  )}
+                </Box>
+
+                {/* Rating */}
+                <Box
                   sx={{
-                    mb: 2,
-                    bgcolor: "success.light",
-                    color: "success.dark",
-                    fontWeight: 500,
+                    display: "flex",
+                    alignItems: "center",
+                    mt: 1,
+                    bgcolor: "#f9f9f9",
+                    width: "fit-content",
+                    px: 0.5,
+                    borderRadius: 0.5,
                   }}
-                />
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      color: "#282c3f",
+                      fontWeight: 500,
+                      fontSize: "12px",
+                    }}
+                  >
+                    4.5{" "}
+                    <Star sx={{ fontSize: 10, ml: 0.3, color: "#14958f" }} />
+                  </Typography>
+                </Box>
 
                 {/* Price Section */}
                 <Box sx={{ mb: 2 }}>
@@ -349,7 +385,7 @@ const Product = () => {
                         variant="h5"
                         sx={{ color: "primary.main", fontWeight: 700 }}
                       >
-                        $
+                        ₹
                         {(product.price * (1 - product.discount / 100)).toFixed(
                           2
                         )}
@@ -361,13 +397,13 @@ const Product = () => {
                           color: "text.secondary",
                         }}
                       >
-                        ${product.price}
+                        ₹{product.price}
                       </Typography>
                       <Typography
                         variant="caption"
                         sx={{ color: "error.main", fontWeight: 600 }}
                       >
-                        SAVE $
+                        SAVE ₹
                         {(product.price * (product.discount / 100)).toFixed(2)}
                       </Typography>
                     </Stack>
@@ -382,57 +418,23 @@ const Product = () => {
                 </Box>
 
                 {/* Stock Status */}
-                <Box sx={{ mb: 3 }}>
-                  <Stack direction="row" alignItems="center" gap={1}>
-                    <Box
-                      sx={{
-                        width: 8,
-                        height: 8,
-                        borderRadius: "50%",
-                        bgcolor:
-                          product.stock > 0 ? "success.main" : "error.main",
-                      }}
-                    />
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color:
-                          product.stock > 0 ? "success.main" : "error.main",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {product.stock > 0 ? "In Stock" : "Out of Stock"}
-                    </Typography>
-                  </Stack>
-                </Box>
+                <Chip
+                  label={product.stock > 0 ? "In Stock" : "Out of Stock"}
+                  color={product.stock > 0 ? "success" : "error"}
+                  size="small"
+                  variant="outlined"
+                  sx={{ my: 2 }}
+                />
 
                 {/* Action Button */}
                 <Button
                   variant="contained"
+                  color={product.stock > 0 ? "primary" : "inherit"}
                   fullWidth
                   disabled={product.stock === 0}
                   sx={{
-                    background:
-                      product.stock > 0
-                        ? "linear-gradient(45deg, #4caf50, #66bb6a)"
-                        : "grey.300",
-                    color: "white",
-                    py: 1.5,
-                    fontSize: "16px",
+                    py: 1,
                     fontWeight: 600,
-                    borderRadius: 2,
-                    "&:hover":
-                      product.stock > 0
-                        ? {
-                            background:
-                              "linear-gradient(45deg, #388e3c, #4caf50)",
-                            transform: "translateY(-2px)",
-                            boxShadow: "0 6px 20px rgba(76, 175, 80, 0.4)",
-                          }
-                        : {},
-                    "&:disabled": {
-                      color: "text.secondary",
-                    },
                   }}
                 >
                   {product.stock > 0 ? "Shop Now" : "Out of Stock"}

@@ -1,6 +1,9 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import { firestoreService, type Product } from "../services/firestoreService";
 
+// This API handles Firestore data operations
+// Image uploads are handled separately by the Python API (api/app.py)
+
 export const productsApi = createApi({
   reducerPath: "productsApi",
   baseQuery: fakeBaseQuery(),
